@@ -84,45 +84,6 @@ void testLoop() {
   afstandM = readDistance(pinAfstandTrigM, pinAfstandEchoM) / 29 / 2; 
 
   // bepaal toestand
-  if (testToestand == RECHTSAF) {
-    if (millis() - testToestandStartTijd > 1000) {
-      testToestandStartTijd = millis();
-      testToestand = LINKSAF;
-    }
-  }
-  if (testToestand == LINKSAF) {
-    if (millis() - testToestandStartTijd > 1000) {
-      testToestandStartTijd = millis();
-      testToestand = VOORUIT;
-    }
-  }
-  if (testToestand == VOORUIT) {
-    if (millis() - testToestandStartTijd > 1000) {
-      testToestandStartTijd = millis();
-      testToestand = WACHT;
-    }
-  }
-
-  // bepaal snelheid afhankelijk van toestand
-  // snelheid kan 0 t/m 255 zijn
-  // bij lage getallen (ongeveer onder 100) heeft de motor 
-  // te weinig kracht om te rijden
-  if (testToestand == RECHTSAF) {
-    snelheidR = 0;
-    snelheidL = 128;
-  }
-  if (testToestand == LINKSAF) {
-    snelheidR = 128;
-    snelheidL = 0;
-  }
-  if (testToestand == VOORUIT) {
-    snelheidR = 128;
-    snelheidL = 128;
-  }
-  if (testToestand == WACHT) {
-    snelheidR = 0;
-    snelheidL = 0;
-  }
 
   // zet waarden voor acturatoren, voor alle testToestanden
   // zet motorsnelheid
@@ -182,27 +143,32 @@ void setup() {
 void loop()
 {
   // toestand bepalen
-  if (toestand == TEST) {
-    if (millis() - toestandStartTijd > 10000) {
-      toestandStartTijd = millis();
-      toestand = STOP;
+    if (afstandM < 30 && afstandL > 30 && afstandR < 30) {
+      toestand = rechtsaf;
     }
-  }
-  if (toestand == STOP) {
-    // de auto blijft in de toestand STOP
-  }
 
-  // de dingen doen die per toestand gedaan worden
-  if (toestand == TEST) {
-    testLoop();
-  }
-  if (toestand == STOP) {
+      if (afstandM < 30 && afstandL < 30 && afstandR > 30) {
+      toestand = linksaf;
+    }
+
+    if (afstandM > 40) {
+      toestand = vooruit;
+    }
+
+// wacht 
+
+    if (afstandM < 30 && afstandL < 30 && afstandR < 30) {
+      toestand = wacht;
+    }
+
+
+  if (toestand == rechtsaf) {
     // zet motoren stil
-    analogWrite(pinMotorSnelheidR, 0);
-    analogWrite(pinMotorSnelheidL, 0);
+    analogWrite(pinMotorSnelheidR, 255);
+    analogWrite(pinMotorSnelheidL, 155);
     // zet tekst op display
     regelBoven = "                ";
-    regelOnder = "      STOP      ";
+    regelOnder = "      RECHTSAF      ";
     lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
     lcd.print(regelBoven);
     lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
@@ -210,6 +176,49 @@ void loop()
     Serial.println("STOP");
   }
 
+  if (toestand == linksaf) {
+    // zet motoren stil
+    analogWrite(pinMotorSnelheidR, 155);
+    analogWrite(pinMotorSnelheidL, 255);
+    // zet tekst op display
+    regelBoven = "                ";
+    regelOnder = "      LINKSAF      ";
+    lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
+    lcd.print(regelBoven);
+    lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
+    lcd.print(regelOnder);
+    Serial.println("STOP");
+  }
+
+  
+  if (toestand == vooruit) {
+    // zet motoren stil
+    analogWrite(pinMotorSnelheidR, 255);
+    analogWrite(pinMotorSnelheidL, 255);
+    // zet tekst op display
+    regelBoven = "                ";
+    regelOnder = "      RECHTSAF      ";
+    lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
+    lcd.print(regelBoven);
+    lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
+    lcd.print(regelOnder);
+    Serial.println("STOP");
+  }
+
+  
+  if (toestand == wacht) {
+    // zet motoren stil
+    analogWrite(pinMotorSnelheidR, 0);
+    analogWrite(pinMotorSnelheidL, 0);
+    // zet tekst op display
+    regelBoven = "                ";
+    regelOnder = "      wacht      ";
+    lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
+    lcd.print(regelBoven);
+    lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
+    lcd.print(regelOnder);
+    Serial.println("STOP");
+  }
   // vertraging om te zorgen dat de seriële monitor de berichten bijhoudt
   delay(100);
 }
