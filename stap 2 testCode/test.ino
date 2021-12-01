@@ -1,4 +1,4 @@
-              #include <LiquidCrystal.h>
+#include <LiquidCrystal.h>
 
 /*****************************************
    variabelen die je gebruikt
