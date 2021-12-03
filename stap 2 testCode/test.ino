@@ -106,33 +106,28 @@ void loop() {
   // bepaal toestand
 
 if (toestand == VOORUIT) {
-    if (millis() - toestandStartTijd > 1000 && afstandM < 20 && afstandR < 20 && afstandL > 20) {
+    if (afstandM < 20 && afstandR < 20 && afstandL > 20) { // Turn left
       toestandStartTijd = millis();
     snelheidR = 255;
     snelheidL = 0;
-    }
-
-      if (millis() - toestandStartTijd > 1000 && afstandM < 20 && afstandL < 20 && afstandR > 20) {
+    } else if (afstandM < 20 && afstandL < 20 && afstandR > 20) {  // Turn Right
       toestandStartTijd = millis();
           snelheidR = 0;
     snelheidL = 255;
-  }
-
-    if (millis() - toestandStartTijd > 1000 && afstandM > 30) {
+  } else if (afstandM > 30) { // Naar voren
       toestandStartTijd = millis();
     snelheidR = 128;
     snelheidL = 128;
-    }
-
-        if (millis() - toestandStartTijd > 1000 && afstandM > 30) {
+    }else if (afstandM > 30) {
       toestandStartTijd = millis();
     snelheidR = 128;
     snelheidL = 128;
-    }
-      if (millis() - toestandStartTijd > 1000 && afstandL < 20 && afstandR < 20 && afstandM < 20) {
+    } else if (afstandL < 20 && afstandR < 20 && afstandM < 20) {
       toestandStartTijd = millis();
      snelheidR = 0;
     snelheidL = 0;
+    } else {
+      toestand = VOORUIT;
     }
   }
 
