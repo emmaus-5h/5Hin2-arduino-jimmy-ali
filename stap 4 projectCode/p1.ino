@@ -1,19 +1,11 @@
-/*****************************************
- * Auto Startcode                        *
- * met toestansdiagrammen                *
- * Emmauscollege                         *
- * v20201117GEE                          *
- *****************************************/
- 
-// libraries die je gebruikt
 #include <LiquidCrystal.h>
 
 /*****************************************
- * variabelen die je gebruikt            *
+   variabelen die je gebruikt
  *****************************************/
 
 // initialize het display
-// de helderheid van het display regel je met de potmeter op de auto, 
+// de helderheid van het display regel je met de potmeter op de auto,
 // daarvoor is geen code nodig
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
@@ -31,27 +23,22 @@ const int pinMotorSnelheidL = 10; // motor links
 long afstandR = 0;
 long afstandL = 0;
 long afstandM = 0;
-int snelheidR = 0; 
-int  snelheidL = 0;
+int snelheidR = 2;
+int  snelheidL = 2;
 String regelBoven = "";
 String regelOnder = "";
 
 // variabelen voor de toestanden maken
 // toestanden:
-const int TEST = 1;
-const int STOP = 2;
-int toestand = TEST;
-unsigned long toestandStartTijd = 0;
-// subtoestanden van TEST:
 const int RECHTSAF = 1;
 const int LINKSAF = 2;
 const int VOORUIT = 3;
 const int WACHT = 4;
-int testToestand = RECHTSAF;
-unsigned long testToestandStartTijd = 0;
+int toestand = RECHTSAF;
+unsigned long toestandStartTijd = 0;
 
 /*****************************************
- * functies die je gebruikt              *
+   functies die je gebruikt
  *****************************************/
 
 // functie om afstandssensor uit te lezen
@@ -68,76 +55,17 @@ long readDistance(int triggerPin, int echoPin)
   pinMode(echoPin, INPUT);
   // Reads the echo pin, and returns the sound wave travel time in microseconds
   // timeout after 30.000 microseconds (around 5 meters)
-  echoTime = pulseIn(echoPin, HIGH, 30000); 
+  echoTime = pulseIn(echoPin, HIGH, 30000);
   if (echoTime == 0) {
     echoTime = 30000;
   }
   return echoTime;
 }
 
-void testLoop() {
-  // lees afstandssensoren uit
-  // dit is nodig voor alle test toestanden
-  // omrekenen naar centimeters = milliseconden / 29 / 2
-  afstandR = readDistance(pinAfstandTrigR, pinAfstandEchoR) / 29 / 2; 
-  afstandL = readDistance(pinAfstandTrigL, pinAfstandEchoL) / 29 / 2; 
-  afstandM = readDistance(pinAfstandTrigM, pinAfstandEchoM) / 29 / 2; 
 
-  // bepaal toestand
-  if (testToestand == RECHTSAF) {
-    if (afstandL <= 100) {
-      toestand = VOORUIT;
-    }
-  }
-  if (testToestand == LINKSAF) {
-  }
-  if (testToestand == VOORUIT) {
-  }
-
-  // bepaal snelheid afhankelijk van toestand
-  // snelheid kan 0 t/m 255 zijn
-  // bij lage getallen (ongeveer onder 100) heeft de motor 
-  // te weinig kracht om te rijden
-  if (testToestand == RECHTSAF) {
-    snelheidR = 255;
-    snelheidL = 255;
-  }
-  if (testToestand == LINKSAF) {
-    snelheidR = 255;
-    snelheidL = 0;
-  }
-  if (testToestand == VOORUIT) {
-    snelheidR = 255;
-    snelheidL = 255;
-  }
-  if (testToestand == WACHT) {
-    snelheidR = 0;
-    snelheidL = 0;
-  }
-
-  // zet waarden voor acturatoren, voor alle testToestanden
-  // zet motorsnelheid
-  analogWrite(pinMotorSnelheidR, snelheidR);
-  analogWrite(pinMotorSnelheidL, snelheidL);
-  // zet tekst op display
-  regelBoven = String(afstandL) + "   " + 
-               String(afstandM) + "   " + 
-               String(afstandR) + "   ";
-  regelOnder = String(snelheidL) + 
-               " TEST" + String(testToestand) + " " + 
-               String(snelheidR) + "      ";
-  lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
-  lcd.print(regelBoven);
-  lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
-  lcd.print(regelOnder);
-  // zet debug info op de seriële monitor
-  Serial.print(regelBoven);
-  Serial.print("--");
-  Serial.println(regelOnder);
-}
 
 /*****************************************
- * setup() en loop()                     *
+   setup() en loop()
  *****************************************/
 
 void setup() {
@@ -157,48 +85,69 @@ void setup() {
 
   // opstart bericht op console en seriële monitor
   lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
-  lcd.print("Auto v20201021");
+  lcd.print("Prototype");
   lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
-  lcd.print("SETUP");// print demo bericht
-  Serial.println("Auto start");
+  lcd.print("1");
   delay(2000); // wachttijd om het display te lezen en de auto neer te zetten
 
   // zet toestanden en in beginstand
-  toestand = TEST;
+  toestand = VOORUIT;
   toestandStartTijd = millis();
-  testToestand = RECHTSAF;
-  testToestandStartTijd = millis();
 }
 
-void loop()
-{
-  // toestand bepalen
-  if (toestand == TEST) {
-    if (millis() - toestandStartTijd > 1000000) {
+void loop() {
+  // lees afstandssensoren uit
+  // dit is nodig voor alle test toestanden
+  // omrekenen naar centimeters = milliseconden / 29 / 2
+  afstandR = readDistance(pinAfstandTrigR, pinAfstandEchoR) / 29 / 2;
+  afstandL = readDistance(pinAfstandTrigL, pinAfstandEchoL) / 29 / 2;
+  afstandM = readDistance(pinAfstandTrigM, pinAfstandEchoM) / 29 / 2;
+
+  // bepaal toestand
+
+if (toestand == VOORUIT) {
+    if (afstandM < 20 && afstandR < 20 && afstandL > 20) { // Gaat naar rechts, maar de snelheidR > snelheidL zodat hij geen rondje draait maar langzaam roteert.
       toestandStartTijd = millis();
+    snelheidR = 135;
+    snelheidL = 128;
+    } else if (afstandM < 20 && afstandL < 20 && afstandR > 20) {  // Gaat naar rechts, maar de snelheidR < snelheidL zodat hij geen rondje draait maar langzaam roteert.
+      toestandStartTijd = millis();
+          snelheidR = 128;
+    snelheidL = 135;
+  } else if (afstandM > 30) { // Gaat naar voren als de afstandM middensensor groter is dan 30
+      toestandStartTijd = millis();
+    snelheidR = 128;
+    snelheidL = 128;
+    } else if (afstandM < 20 && afstandL < 20 && afstandR < 20) { // Als er bij elke sensor minder dan 20 is dan stopt de auto.
+      toestandStartTijd = millis();
+     snelheidR = 0;
+    snelheidL = 0;
+    } else { // Als hij geen enkele toestand kan vinden waar het past wordt de snelheid heel traag (110)
+      snelheidR = 110;
+      snelheidL = 110;
     }
   }
-  if (toestand == STOP) {
-    // de auto blijft in de toestand STOP
-  }
 
-  // de dingen doen die per toestand gedaan worden
-  if (toestand == TEST) {
-    testLoop();
-  }
-  if (toestand == STOP) {
-    // zet motoren stil
-    analogWrite(pinMotorSnelheidR, 0);
-    analogWrite(pinMotorSnelheidL, 0);
-    // zet tekst op display
-    regelBoven = "                ";
-    regelOnder = "      STOP      ";
-    lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
-    lcd.print(regelBoven);
-    lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
-    lcd.print(regelOnder);
-    Serial.println("STOP");
-  }
+
+  // zet waarden voor acturatoren, voor alle toestanden
+  // zet motorsnelheid
+  analogWrite(pinMotorSnelheidR, snelheidR);
+  analogWrite(pinMotorSnelheidL, snelheidL);
+  // zet tekst op display
+  regelBoven = String(afstandL) + "   " +
+               String(afstandM) + "   " +
+               String(afstandR) + "   ";
+  regelOnder = String(snelheidL) +
+               " TEST" + String(toestand) + " " +
+               String(snelheidR) + "      ";
+  lcd.setCursor(0, 0); // zet cursor op het begin van de bovenste regel
+  lcd.print(regelBoven);
+  lcd.setCursor(0, 1); // zet cursor op het begin van de onderste regel
+  lcd.print(regelOnder);
+  // zet debug info op de seriële monitor
+  Serial.print(regelBoven);
+  Serial.print("--");
+  Serial.println(regelOnder);
 
   // vertraging om te zorgen dat de seriële monitor de berichten bijhoudt
   delay(100);
