@@ -1,3 +1,7 @@
+** Belangrijk **
+
+De middensensor werkte niet ( hadden we tegen u verteld ), dus had ik bij de code afstandM tijdelijk weggehaald zodat we toch nog iets kunnen demonstreren. In het filmpje ziet u dat de robot auto draait wanneer er een object dichtbij is, hij draait net iets te snel dus hadden we code aangepast zodat de robot langzamer draait.
+
 ## Je levert in door in deze map de bestanden uit andere mappen te kopieren
 Je levert in:
 1.	Een circuit/aansluitschema (.pdf of .jpg bestand) van je Arduino en alles wat je erop hebt aangesloten.
